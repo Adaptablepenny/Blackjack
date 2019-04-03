@@ -133,6 +133,7 @@ int Game::GameLoop()
 		//Welcome the  player
 		//Setup player and dealer
 		bool dealerTurn = false;
+		bool pOutcome = false;
 		//Begin Game Loop
 		//Place Bet
 		int bet = GetBet();
@@ -172,6 +173,13 @@ int Game::GameLoop()
 				HandleChoice(HIT);
 				cout << "Your Hand: ";
 				player.printHand();
+				if (player.GetHandTotal() > 21)
+				{
+					HandleOutcome(LOSE, bet);
+					cout << "\nPlayer Bust!\n";
+					running = false;
+
+				}
 			} //END OF CHOICE 1
 
 			if (choice == 2)
@@ -193,47 +201,35 @@ int Game::GameLoop()
 			while (dealerTurn)
 			{
 				//Turn plays out ***Code the logic for the dealer to continue drawing >=17 then stop, compare values and process outcomes.
-				if (dealer.GetHandTotal < 17)
+				if (dealer.GetHandTotal() < 17)
 					dealer.Draw();
-				if (dealer.GetHandTotal >= 17)
-					dealerTurn = false;//exit loop
+				if (dealer.GetHandTotal() >= 17)
+					pOutcome = true;
+					dealerTurn = false;
+					break;//exit loop
 			}
 			
 			
-
+			while(pOutcome)
 			//Process Outcome, do not forget to change running to false to break the loop.
 						//**** DRAFT CODE ****
 			if (player.GetHandTotal() == 21 && dealer.GetHandTotal() != 21)
 			{
 				HandleOutcome(WIN, bet);
 				running = false;
-				bet = 0;
-				player.Clear();
-				dealer.Clear();
 			}
-			if (player.GetHandTotal() > 21)
-			{
-				HandleOutcome(LOSE, bet);
-				cout << "\nPlayer Bust!\n";
-				running = false;
-				bet = 0;
-				player.Clear();
-				dealer.Clear();
-			}
+			
 			if (dealer.GetHandTotal() > 21)
 			{
 				HandleOutcome(WIN, bet);
 				cout << "\nDealer Bust!\n";
 				running = false;
-				bet = 0;
 			}
 			if (player.GetHandTotal() != 21 && dealer.GetHandTotal() == 21)
 			{
 				HandleOutcome(LOSE, bet);
 				running = false;
-				bet = 0;
-				player.Clear();
-				dealer.Clear();
+				
 			}
 			//Added in the Dealer Turn branch, theres gotta be a better way to process all of these outcomes.
 			if (player.GetHandTotal() > dealer.GetHandTotal())
@@ -241,14 +237,12 @@ int Game::GameLoop()
 				HandleOutcome(WIN, bet);
 				cout << "Player Wins!";
 				running = false;
-				bet = 0;
 			}
 			if (player.GetHandTotal() < dealer.GetHandTotal())
 			{
 				HandleOutcome(LOSE, bet);
 				cout << "Dealer Wins!";
 				running = false;
-				bet = 0;
 			}
 		}
 		
@@ -264,6 +258,9 @@ int Game::GameLoop()
 
 			if (play == 'y')
 				running = true;
+				player.Clear();
+				dealer.Clear();
+				bet = 0;
 				//How to reset bet? Maybe a clear bet function?
 			if(play == 'n')
 				break;
