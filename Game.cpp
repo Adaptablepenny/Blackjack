@@ -95,21 +95,31 @@ void Game::HandleChoice(CHOICE pC)
 		case HIT: 
 		{
 			player.Draw();
-			//player.printHand();
-			dealer.Draw();
-			//dealer.printHand();
 			break;
 		}
 		case STAY:
 		{
-			dealer.Draw();
-			dealer.printHand();
 			break;
 		}
 
 		case DOUBLE:
 		{
-			//What to do
+			//Ask for new bet that is at most half of the orignal bet
+			while (true)
+			{
+				int dBet = GetBet();
+				if (dBet > bet / 2); //Well shit, how do I get the orignal bet into here? way to pass an argument like HandOutcome function?
+					//bet to much try again
+				if (dBet <= bet / 2);
+				//Draw one more card
+					player.Draw();
+					break;
+
+					//also go to figure out how to deal with dollar bets, might have to switch to different integer type to take decimal points.
+					
+			}
+			//break and proceed to outcome
+			break;
 		}
 
 		case SPLIT:
@@ -161,7 +171,8 @@ int Game::GameLoop()
 			cout << endl << "Would you like to: " << endl;
 			cout << "1> Hit\n";
 			cout << "2> Stay\n";
-			cout << "3> Double\n";
+			if(player.GetHandCard(0) == 9 || player.GetHandCard(0) == 10 || player.GetHandCard(0) == 11 || player.GetHandCard(1) == 9 || player.GetHandCard(1) == 10 || player.GetHandCard(1) == 11)
+				cout << "3> Double\n";
 			if (player.GetHandCard(0) == player.GetHandCard(1))
 				cout << "4> Split\n";
 			//Need to implement insurance, but need to understand it first.
@@ -210,10 +221,10 @@ int Game::GameLoop()
 				//Understand what goes down on a split.
 
 			//Dealer Plays
-			//Wile Loop Start ***Set a check to show the player is done, maybe if choice equals 2?
+			//While loop start for Dealer
 			while (dealerTurn)
 			{
-				//Turn plays out ***Code the logic for the dealer to continue drawing >=17 then stop, compare values and process outcomes.
+				//Dealer turn plays out 				
 				if (dealer.GetHandTotal() < 17)
 					dealer.Draw();
 				cout << "\nDealers Hand: ";
@@ -225,13 +236,15 @@ int Game::GameLoop()
 					dealerTurn = false;
 					break;//exit loop
 				}
+				
+				
+				
 			}
 
 
 			while (pOutcome)
 			{
 				//Process Outcome, do not forget to change running to false to break the loop.
-							//**** DRAFT CODE ****
 			
 				if (dealer.GetHandTotal() > 21)
 				{
@@ -298,12 +311,6 @@ int Game::GameLoop()
 				break;
 
 		}
-
-		
-
-
-
-
 
 	}
 	return  0;
