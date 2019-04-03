@@ -11,3 +11,6 @@
 /.vs/slnx.sqlite
 /.vs
 /Debug
+*.ipch
+*.db
+/Blackjack/.vs/Blackjack/v16/.suo
