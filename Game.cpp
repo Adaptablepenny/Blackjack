@@ -176,10 +176,10 @@ int Game::GameLoop()
 			} //END OF CHOICE 1
 			if (choice == 2)
 				HandleChoice(STAY);
-				//Dealer hits here, but isnt there a rule where they cant hit pass 17?
+			//Dealer hits here, but isnt there a rule where they cant hit pass 17?
 			if (choice == 3)
 				HandleChoice(DOUBLE);
-				//Understand what goes down on a double
+			//Understand what goes down on a double
 			if (choice == 4)
 				HandleChoice(SPLIT); // add input validaiton so split cannot be selected when its not there.
 				//Understand what goes down on a split.
@@ -189,29 +189,37 @@ int Game::GameLoop()
 			//Process Outcome, do not forget to change running to false to break the loop.
 						//**** DRAFT CODE ****
 			if (player.GetHandTotal() == 21 && dealer.GetHandTotal() != 21)
+			{
 				HandleOutcome(WIN, bet);
 				running = false;
 				bet = 0;
 				player.Clear();
 				dealer.Clear();
+			}
 			if (player.GetHandTotal() > 21)
+			{
 				HandleOutcome(LOSE, bet);
 				cout << "\nPlayer Bust!\n";
 				running = false;
 				bet = 0;
 				player.Clear();
 				dealer.Clear();
+			}
 			if (dealer.GetHandTotal() > 21)
+			{
 				HandleOutcome(WIN, bet);
 				cout << "\nDealer Bust!\n";
 				running = false;
 				bet = 0;
+			}
 			if (player.GetHandTotal() != 21 && dealer.GetHandTotal() == 21)
+			{
 				HandleOutcome(LOSE, bet);
 				running = false;
 				bet = 0;
 				player.Clear();
 				dealer.Clear();
+			}
 			
 		}
 		
@@ -227,7 +235,7 @@ int Game::GameLoop()
 
 			if (play == 'y')
 				running = true;
-				//How to reset bet? Maybe a clear bet function?
+				
 			if(play == 'n')
 				break;
 
