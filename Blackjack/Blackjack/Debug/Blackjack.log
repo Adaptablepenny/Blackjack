@@ -1,8 +1,0 @@
-﻿  Blackjack.cpp
-C:\Users\Tara & Mike\source\repos\Blackjack\Blackjack\actor.h(90): warning C4018: '<=': signed/unsigned mismatch
-  Game.cpp
-C:\Users\Tara & Mike\source\repos\Blackjack\Blackjack\actor.h(90): warning C4018: '<=': signed/unsigned mismatch
-C:\Users\Tara & Mike\source\repos\Blackjack\Blackjack\Game.cpp(81): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
-  Generating Code...
-C:\Users\Tara & Mike\source\repos\Blackjack\Blackjack\Game.cpp(73): warning C4715: 'Game::GetBet': not all control paths return a value
-  Blackjack.vcxproj -> C:\Users\Tara & Mike\source\repos\Blackjack\Debug\Blackjack.exe

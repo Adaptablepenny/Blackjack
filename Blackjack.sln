@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
-VisualStudioVersion = 16.0.28721.148
+VisualStudioVersion = 16.0.28729.10
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Blackjack", "Blackjack.vcxproj", "{CB514E87-3C81-4980-9BB6-C3E2FB116951}"
 EndProject
@@ -26,6 +26,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {DD2D7B6A-7C9F-41DF-856D-0E9F55F2B36B}
+		SolutionGuid = {684979CB-535A-4972-9BD6-A55B400E6050}
 	EndGlobalSection
 EndGlobal

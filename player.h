@@ -12,11 +12,13 @@ public:
 
 	Player()
 	{
+		Wallet = 0;
 		deck = nullptr;
 	}
 
 	Player(Deck* ptrDeck)
 	{
+		Wallet = 0;
 		deck = ptrDeck;
 	}
 
