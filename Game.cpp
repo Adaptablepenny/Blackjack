@@ -132,6 +132,7 @@ int Game::GameLoop()
 		
 		//Welcome the  player
 		//Setup player and dealer
+		bool dealerTurn = false;
 		//Begin Game Loop
 		//Place Bet
 		int bet = GetBet();
@@ -171,12 +172,15 @@ int Game::GameLoop()
 				HandleChoice(HIT);
 				cout << "Your Hand: ";
 				player.printHand();
-				cout << "\nDealers Hand: ";
-				dealer.printHand();
 			} //END OF CHOICE 1
+
 			if (choice == 2)
+			{
 				HandleChoice(STAY);
-				//Dealer hits here, but isnt there a rule where they cant hit pass 17?
+				player.printHand();
+				dealerTurn = true;
+			}//END OF CHOICE 2
+
 			if (choice == 3)
 				HandleChoice(DOUBLE);
 				//Understand what goes down on a double
@@ -184,35 +188,68 @@ int Game::GameLoop()
 				HandleChoice(SPLIT); // add input validaiton so split cannot be selected when its not there.
 				//Understand what goes down on a split.
 
-			//Dealer Plays not sure what to do here? Couldnt it just play out when process actions?
+			//Dealer Plays
+			//Wile Loop Start ***Set a check to show the player is done, maybe if choice equals 2?
+			while (dealerTurn)
+			{
+				//Turn plays out ***Code the logic for the dealer to continue drawing >=17 then stop, compare values and process outcomes.
+				if (dealer.GetHandTotal < 17)
+					dealer.Draw();
+				if (dealer.GetHandTotal >= 17)
+					dealerTurn = false;//exit loop
+			}
+			
+			
 
 			//Process Outcome, do not forget to change running to false to break the loop.
 						//**** DRAFT CODE ****
 			if (player.GetHandTotal() == 21 && dealer.GetHandTotal() != 21)
+			{
 				HandleOutcome(WIN, bet);
 				running = false;
 				bet = 0;
 				player.Clear();
 				dealer.Clear();
+			}
 			if (player.GetHandTotal() > 21)
+			{
 				HandleOutcome(LOSE, bet);
 				cout << "\nPlayer Bust!\n";
 				running = false;
 				bet = 0;
 				player.Clear();
 				dealer.Clear();
+			}
 			if (dealer.GetHandTotal() > 21)
+			{
 				HandleOutcome(WIN, bet);
 				cout << "\nDealer Bust!\n";
 				running = false;
 				bet = 0;
+			}
 			if (player.GetHandTotal() != 21 && dealer.GetHandTotal() == 21)
+			{
 				HandleOutcome(LOSE, bet);
 				running = false;
 				bet = 0;
 				player.Clear();
 				dealer.Clear();
-			
+			}
+			//Added in the Dealer Turn branch, theres gotta be a better way to process all of these outcomes.
+			if (player.GetHandTotal() > dealer.GetHandTotal())
+			{
+				HandleOutcome(WIN, bet);
+				cout << "Player Wins!";
+				running = false;
+				bet = 0;
+			}
+			if (player.GetHandTotal() < dealer.GetHandTotal())
+			{
+				HandleOutcome(LOSE, bet);
+				cout << "Dealer Wins!";
+				running = false;
+				bet = 0;
+			}
 		}
 		
 
