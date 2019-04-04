@@ -35,6 +35,8 @@ protected:
 	Dealer dealer;
 	Actor actor;
 	bool running;
+	int bet;
+	bool dealerTurn;
 
 	
 };
