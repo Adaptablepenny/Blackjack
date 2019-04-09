@@ -1,3 +1,4 @@
+
 #include "Game.h"
 
 Game::Game()
@@ -58,7 +59,7 @@ int Game::GetBet()
 	//Betting Loop
 	while (betAmount <= 0)
 	{
-		cout << "Place Your Bets!" << endl << "Current Balance: $" << player.GetWallet() << endl << "Bet: ";
+		cout << "Place Your Bets!" << endl << "Current Balance: $" << player.GetWallet() << endl << "Bet: $";
 		cin >> betAmount;
 		if (betAmount <= player.GetWallet())
 		{
@@ -144,7 +145,13 @@ void Game::HandleChoice(CHOICE pC)
 
 		case SPLIT:
 		{
-			//What to do
+			//Create a new hand starting with one of the cards from the orignal hand
+			
+			
+			//Add orignal bet again.
+			//Seperate both hands into their own HandleChoice loop
+			//Process outcome for each hand individually
+			//break;
 		}
 	}
 }

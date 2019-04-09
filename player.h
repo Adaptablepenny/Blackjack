@@ -27,12 +27,6 @@ public:
 		Clear();
 	}
 
-	// losing function to replay the game
-	void Lose()
-	{
-		cout << "losing stuff here";
-	}
-
 	//Function for betting can this go away?
 	void Betting()
 	{
@@ -51,6 +45,11 @@ public:
 		}
 		
 	}
+	void splitDraw()
+	{
+		splitHand.push_back(deck->drawCard());
+		deck->deckList.pop_back();
+	}
 
 	int GetWallet()
 	{
@@ -64,4 +63,5 @@ public:
 protected:
 	int Wallet;
 	int betCash = 0;
+	vector<int> splitHand;
 };
