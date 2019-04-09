@@ -25,6 +25,7 @@ public:
 	~Player()
 	{
 		Clear();
+		ClearSplit();
 	}
 
 	//Function for betting can this go away?
@@ -99,6 +100,12 @@ public:
 	void ChangeWallet(int pX)
 	{
 		Wallet += pX;
+	}
+
+
+	void ClearSplit()
+	{
+		splitHand.erase(splitHand.begin(), splitHand.end());
 	}
 protected:
 	int Wallet;

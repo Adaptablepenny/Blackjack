@@ -157,7 +157,6 @@ void Game::HandleChoice(CHOICE pC)
 			
 			//Seperate both hands into their own HandleChoice loop
 			//Process outcome for each hand individually
-			//break;
 		}
 	}
 }
@@ -207,15 +206,17 @@ int Game::GameLoop()
 			cout << "2> Stay\n";
 			if(player.GetHandTotal() == 9 || player.GetHandTotal() == 10 || player.GetHandTotal() == 11)
 				cout << "3> Double\n";
+				//bool pDouble; //input validation for choice 3
 			if (player.GetHandCard(0) == player.GetHandCard(1))
 				cout << "4> Split\n";
+				//bool pSplit//input validation for choice 4
 			//Need to implement insurance, but need to understand it first.
 			cin >> choice;
 
 			//Process choice selection
 			if (choice == 1)
 			{
-				HandleChoice(HIT);				
+				HandleChoice(HIT);		
 			}
 
 			if (choice == 2)
@@ -223,7 +224,7 @@ int Game::GameLoop()
 				HandleChoice(STAY);				
 			}
 
-			if (choice == 3)
+			if (choice == 3 /*&& pDouble*/)
 			{
 				HandleChoice(DOUBLE);//add input validation so it cannot be selected while its not there
 				cout << "\nYou are doubling down! Your bet is being doubled!" << endl;
@@ -232,12 +233,39 @@ int Game::GameLoop()
 				cout << "\nNew Bet: " << bet;
 			}
 			
-			if (choice == 4)
+			if (choice == 4/*&& pSplit*/)
 			{
 				HandleChoice(SPLIT);
-				cout << "You're splitting!";
+				cout << "\nYou're splitting!\n";
+				player.ChangeWallet(-bet);
+				bet = bet * 2;
+			}
 
-				//Add orignal bet to a new bet
+			if (player.GetSplitTotal() > 0)
+			{
+				int splitchoice;
+				cout << "\n\nSplit Hand: ";
+				player.printSplitHand();
+				cout << "\nWhat would you like to do for the splitted hand? ";
+				cout << "\n1> Hit \n";
+				cout << "2> Stay \n";
+				cin >> splitchoice;
+				if (splitchoice == 1)
+				{
+					player.splitDraw();
+					cout << "\nSplit Hand: ";
+					player.printSplitHand();
+					cout << "\n\nYour Hand: ";
+					player.printHand();
+				}
+				if (splitchoice == 2)
+				{
+					cout << "\n\nSplit Hand: ";
+					player.printSplitHand();
+					cout << "\n\n";
+				}
+					
+				
 			}
 				
 			// add input validaiton so split cannot be selected when its not there.
