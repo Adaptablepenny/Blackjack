@@ -147,8 +147,13 @@ void Game::HandleChoice(CHOICE pC)
 		{
 			//Create a new hand starting with one of the cards from the orignal hand
 			player.Split();
-			cout << " Split Hand: ";
+			player.splitDraw();
+			player.Draw();
+			cout << "\nSplit Hand: ";
 			player.printSplitHand();
+			cout << "\nHand: ";
+			player.printHand();
+			break;
 			
 			//Seperate both hands into their own HandleChoice loop
 			//Process outcome for each hand individually
@@ -230,6 +235,8 @@ int Game::GameLoop()
 			if (choice == 4)
 			{
 				HandleChoice(SPLIT);
+				cout << "You're splitting!";
+
 				//Add orignal bet to a new bet
 			}
 				
