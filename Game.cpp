@@ -146,9 +146,10 @@ void Game::HandleChoice(CHOICE pC)
 		case SPLIT:
 		{
 			//Create a new hand starting with one of the cards from the orignal hand
+			player.Split();
+			cout << " Split Hand: ";
+			player.printSplitHand();
 			
-			
-			//Add orignal bet again.
 			//Seperate both hands into their own HandleChoice loop
 			//Process outcome for each hand individually
 			//break;
@@ -227,7 +228,12 @@ int Game::GameLoop()
 			}
 			
 			if (choice == 4)
-				HandleChoice(SPLIT); // add input validaiton so split cannot be selected when its not there.
+			{
+				HandleChoice(SPLIT);
+				//Add orignal bet to a new bet
+			}
+				
+			// add input validaiton so split cannot be selected when its not there.
 				//Understand what goes down on a split.
 
 			//Dealer Plays

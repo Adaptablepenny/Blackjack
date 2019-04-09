@@ -55,7 +55,7 @@ public:
 	{
 		int handTotal = 0;
 		int aces = 0;
-		for (auto x = splitHand.begin); x != splitHand.end(); x++)
+		for (auto x = splitHand.begin(); x != splitHand.end(); x++)
 		{
 			handTotal += *x;
 			if (*x == 11)
@@ -70,6 +70,12 @@ public:
 			}
 		}
 		return handTotal;
+	}
+
+	void Split()
+	{
+		splitHand.push_back(hand[1]);
+		hand.pop_back();
 	}
 
 	int printSplitHand()
