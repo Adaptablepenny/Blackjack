@@ -104,6 +104,7 @@ void Game::HandleChoice(CHOICE pC)
 				HandleOutcome(LOSE, bet);
 				cout << "\nPlayer Bust!\n";
 				running = false;
+				bet = 0;
 				break;
 
 			}
