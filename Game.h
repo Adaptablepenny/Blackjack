@@ -38,6 +38,8 @@ protected:
 	int bet;
 	bool dealerTurn;
 	bool pOutcome;
+	bool pDouble;
+	bool pSplit;
 
 	
 };

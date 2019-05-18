@@ -45,6 +45,10 @@ void Game::SetRunning(bool pRunning)
 
 void Game::InitGame()
 {
+	dealerTurn = false;
+	pOutcome = false;
+	pDouble = false;
+	pSplit = false;
 	running = true;
 	player.SetDeck(&deck);
 	player.ChangeWallet(100);
@@ -166,15 +170,15 @@ int Game::GameLoop()
 
 	//We have initialized
 	InitGame();
+	
 
 	//Begin Game Loop
 	while (running)
 	{
-		
+		bool pSplitTurn = false;
 		//Welcome the  player
 		
-		dealerTurn = false;
-		pOutcome = false;
+	
 		
 		//Place Bet
 		int bet = GetBet();
@@ -202,12 +206,16 @@ int Game::GameLoop()
 			cout << endl << "Would you like to: " << endl;
 			cout << "1> Hit\n";
 			cout << "2> Stay\n";
-			if(player.GetHandTotal() == 9 || player.GetHandTotal() == 10 || player.GetHandTotal() == 11)
+			if (player.GetHandTotal() == 9 || player.GetHandTotal() == 10 || player.GetHandTotal() == 11)
+			{
 				cout << "3> Double\n";
-				//bool pDouble; //input validation for choice 3
+				pDouble = true; //input validation for choice 3
+			}
 			if (player.GetHandCard(0) == player.GetHandCard(1))
+			{
 				cout << "4> Split\n";
-				//bool pSplit//input validation for choice 4
+				pSplit = true; //input validation for choice 4
+			}
 			//Need to implement insurance, but need to understand it first.
 			cin >> choice;
 
@@ -222,24 +230,25 @@ int Game::GameLoop()
 				HandleChoice(STAY);				
 			}
 
-			if (choice == 3 /*&& pDouble*/)
+			if (choice == 3 && pDouble == true)
 			{
-				HandleChoice(DOUBLE);//add input validation so it cannot be selected while its not there
+				HandleChoice(DOUBLE);
 				cout << "\nYou are doubling down! Your bet is being doubled!" << endl;
 				player.ChangeWallet(-bet);
 				bet = bet * 2;
 				cout << "\nNew Bet: " << bet;
 			}
 			
-			if (choice == 4/*&& pSplit*/)
+			if (choice == 4 && pSplit == true)
 			{
 				HandleChoice(SPLIT);
 				cout << "\nYou're splitting!\n";
 				player.ChangeWallet(-bet);
 				bet = bet * 2;
+				pSplitTurn = true;
 			}
 
-			if (player.GetSplitTotal() > 0)
+			if (pSplitTurn)
 			{
 				int splitchoice;
 				cout << "\n\nSplit Hand: ";
@@ -261,12 +270,10 @@ int Game::GameLoop()
 					cout << "\n\nSplit Hand: ";
 					player.printSplitHand();
 					cout << "\n\n";
+					pSplitTurn = false;
 				}
-					
-				
 			}
 				
-			// add input validaiton so split cannot be selected when its not there.
 				//Understand what goes down on a split.
 
 			//Dealer Plays
@@ -283,7 +290,7 @@ int Game::GameLoop()
 				{
 					pOutcome = true;
 					dealerTurn = false;
-					break;//exit loop
+					break;
 				}	
 			}
 
@@ -335,17 +342,18 @@ int Game::GameLoop()
 						bet = 0;
 						break;
 					}
+					if (player.GetHandTotal() < dealer.GetHandTotal())
+					{
+						HandleOutcome(LOSE, bet);
+						cout << "\nDealer Wins!";
+						running = false;
+						bet = 0;
+						break;
+					}
 					break;
 				}
 				
-				if (player.GetHandTotal() < dealer.GetHandTotal())
-				{
-					HandleOutcome(LOSE, bet);
-					cout << "\nDealer Wins!";
-					running = false;
-					bet = 0;
-					break;
-				}
+				
 				if (player.GetHandTotal() == dealer.GetHandTotal())
 				{
 					HandleOutcome(PUSH, bet);
@@ -369,7 +377,11 @@ int Game::GameLoop()
 				player.Clear();
 				dealer.Clear();
 				bet = 0;
-				//How to reset bet? Maybe a clear bet function?
+				dealerTurn = false;
+				pOutcome = false;
+				pDouble = false;
+				pSplit = false;
+				deck.generateDeck();
 			if(play == 'n')
 				break;
 		}
