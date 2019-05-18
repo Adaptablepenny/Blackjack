@@ -101,19 +101,16 @@ void Game::HandleChoice(CHOICE pC)
 			cout << "\nYour Hand Value: " << player.GetHandTotal();
 			if (player.GetHandTotal() > 21)
 			{
-				HandleOutcome(LOSE, bet);
+				//HandleOutcome(LOSE, bet);
 				cout << "\nPlayer Bust!\n";
-				running = false;
-				bet = 0;
+				pOutcome = true;
 				break;
 
 			}
 			if (player.GetHandTotal() == 21 && dealer.GetHandTotal() != 21)
 			{
-				HandleOutcome(WIN, bet);
-				cout << "\nPlayer Wins!";
-				running = false;
-				bet = 0;
+				//HandleOutcome(WIN, bet);
+				pOutcome = true;
 				break;
 			}
 			break;
@@ -177,7 +174,7 @@ int Game::GameLoop()
 		//Welcome the  player
 		
 		dealerTurn = false;
-		bool pOutcome = false;
+		pOutcome = false;
 		
 		//Place Bet
 		int bet = GetBet();
@@ -217,7 +214,7 @@ int Game::GameLoop()
 			//Process choice selection
 			if (choice == 1)
 			{
-				HandleChoice(HIT);		
+				HandleChoice(HIT);
 			}
 
 			if (choice == 2)
@@ -294,7 +291,23 @@ int Game::GameLoop()
 			while (pOutcome)
 			{
 				//Process Outcome, do not forget to change running to false to break the loop.
-				//Theres got to be a better way to process all the outcomes.			
+				//Theres got to be a better way to process all the outcomes.
+				if (player.GetHandTotal() == 21 && dealer.GetHandTotal() != 21)
+				{
+					HandleOutcome(WIN, bet);
+					cout << "\nPlayer Wins!";
+					running = false;
+					bet = 0;
+					break;
+				}
+				if (player.GetHandTotal() > 21)
+				{
+					HandleOutcome(LOSE, bet);
+					cout << "\nYou Lose!\n";
+					running = false;
+					bet = 0;
+					break;
+				}
 				if (dealer.GetHandTotal() > 21)
 				{
 					HandleOutcome(WIN, bet);
@@ -311,15 +324,20 @@ int Game::GameLoop()
 					bet = 0;
 					break;
 
-				}				
-				if (player.GetHandTotal() > dealer.GetHandTotal())
+				}
+				if (player.GetHandTotal() < 21)
 				{
-					HandleOutcome(WIN, bet);
-					cout << "\nPlayer Wins!";
-					running = false;
-					bet = 0;
+					if (player.GetHandTotal() > dealer.GetHandTotal())
+					{
+						HandleOutcome(WIN, bet);
+						cout << "\nPlayer Wins!";
+						running = false;
+						bet = 0;
+						break;
+					}
 					break;
 				}
+				
 				if (player.GetHandTotal() < dealer.GetHandTotal())
 				{
 					HandleOutcome(LOSE, bet);

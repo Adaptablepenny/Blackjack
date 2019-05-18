@@ -37,6 +37,7 @@ protected:
 	bool running;
 	int bet;
 	bool dealerTurn;
+	bool pOutcome;
 
 	
 };
