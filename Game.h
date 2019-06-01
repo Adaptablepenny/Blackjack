@@ -40,6 +40,8 @@ protected:
 	bool pOutcome;
 	bool pDouble;
 	bool pSplit;
+	bool pSplitTurn;
+	bool pSplitOutcome;
 
 	
 };

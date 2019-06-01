@@ -50,6 +50,8 @@ void Game::InitGame()
 	pDouble = false;
 	pSplit = false;
 	running = true;
+	pSplitTurn = false;
+	pSplitOutcome = false;
 	player.SetDeck(&deck);
 	player.ChangeWallet(100);
 	dealer.SetDeck(&deck);
@@ -125,8 +127,16 @@ void Game::HandleChoice(CHOICE pC)
 			cout << "\nYour Hand: ";
 			player.printHand();
 			cout << "\nYour Hand Value: " << player.GetHandTotal();
-			dealerTurn = true;
-			break;
+			if(pSplitTurn)
+			{
+				break;
+			}
+			else 
+			{
+				dealerTurn = true;
+				break;
+			}
+			
 		}
 
 		case DOUBLE:
@@ -175,7 +185,7 @@ int Game::GameLoop()
 	//Begin Game Loop
 	while (running)
 	{
-		bool pSplitTurn = false;
+		
 		//Welcome the  player
 		
 	
@@ -246,6 +256,7 @@ int Game::GameLoop()
 				player.ChangeWallet(-bet);
 				bet = bet * 2;
 				pSplitTurn = true;
+				pSplitOutcome = true;
 			}
 
 			if (pSplitTurn)
@@ -294,47 +305,79 @@ int Game::GameLoop()
 				}	
 			}
 
-
-			while (pOutcome)
+			if (pSplitOutcome)
 			{
-				//Process Outcome, do not forget to change running to false to break the loop.
-				//Theres got to be a better way to process all the outcomes.
-				if (player.GetHandTotal() == 21 && dealer.GetHandTotal() != 21)
+				while (pSplitOutcome)
 				{
-					HandleOutcome(WIN, bet);
-					cout << "\nPlayer Wins!";
-					running = false;
-					bet = 0;
-					break;
-				}
-				if (player.GetHandTotal() > 21)
-				{
-					HandleOutcome(LOSE, bet);
-					cout << "\nYou Lose!\n";
-					running = false;
-					bet = 0;
-					break;
-				}
-				if (dealer.GetHandTotal() > 21)
-				{
-					HandleOutcome(WIN, bet);
-					cout << "\nDealer Bust!\n";
-					running = false;
-					bet = 0;
-					break;
-				}
-				if (player.GetHandTotal() != 21 && dealer.GetHandTotal() == 21)
-				{
-					HandleOutcome(LOSE, bet);
-					cout << "\nDealer Wins!";
-					running = false;
-					bet = 0;
-					break;
+					//Process Outcome, do not forget to change running to false to break the loop.
+					//Theres got to be a better way to process all the outcomes.
+					if (player.GetSplitTotal() == 21 && dealer.GetHandTotal() != 21)
+					{
+						HandleOutcome(WIN, bet);
+						cout << "\nPlayer Wins!";
+						pSplitOutcome = false;
+						break;
+					}
+					if (player.GetSplitTotal() > 21)
+					{
+						HandleOutcome(LOSE, bet);
+						cout << "\nYou Lose!\n";
+						pSplitOutcome = false;
+						break;
+					}
+					if (dealer.GetHandTotal() > 21)
+					{
+						HandleOutcome(WIN, bet);
+						cout << "\nDealer Bust!\n";
+						pSplitOutcome = false;
+						break;
+					}
+					if (player.GetSplitTotal() != 21 && dealer.GetHandTotal() == 21)
+					{
+						HandleOutcome(LOSE, bet);
+						cout << "\nDealer Wins!";
+						pSplitOutcome = false;
+						break;
 
+					}
+					if (player.GetSplitTotal() < 21)
+					{
+						if (player.GetSplitTotal() > dealer.GetHandTotal())
+						{
+							HandleOutcome(WIN, bet);
+							cout << "\nPlayer Wins!";
+							pSplitOutcome = false;
+							break;
+						}
+						if (player.GetSplitTotal() < dealer.GetHandTotal())
+						{
+							HandleOutcome(LOSE, bet);
+							cout << "\nDealer Wins!";
+							pSplitOutcome = false;
+							break;
+						}
+						break;
+					}
+
+
+					if (player.GetSplitTotal() == dealer.GetHandTotal())
+					{
+						HandleOutcome(PUSH, bet);
+						cout << "\nIts a tie!";
+						pSplitOutcome = false;
+						break;
+					}
 				}
-				if (player.GetHandTotal() < 21)
+
+			}
+			else
+			{
+
+				while (pOutcome)
 				{
-					if (player.GetHandTotal() > dealer.GetHandTotal())
+					//Process Outcome, do not forget to change running to false to break the loop.
+					//Theres got to be a better way to process all the outcomes.
+					if (player.GetHandTotal() == 21 && dealer.GetHandTotal() != 21)
 					{
 						HandleOutcome(WIN, bet);
 						cout << "\nPlayer Wins!";
@@ -342,27 +385,64 @@ int Game::GameLoop()
 						bet = 0;
 						break;
 					}
-					if (player.GetHandTotal() < dealer.GetHandTotal())
+					if (player.GetHandTotal() > 21)
+					{
+						HandleOutcome(LOSE, bet);
+						cout << "\nYou Lose!\n";
+						running = false;
+						bet = 0;
+						break;
+					}
+					if (dealer.GetHandTotal() > 21)
+					{
+						HandleOutcome(WIN, bet);
+						cout << "\nDealer Bust!\n";
+						running = false;
+						bet = 0;
+						break;
+					}
+					if (player.GetHandTotal() != 21 && dealer.GetHandTotal() == 21)
 					{
 						HandleOutcome(LOSE, bet);
 						cout << "\nDealer Wins!";
 						running = false;
 						bet = 0;
 						break;
+
 					}
-					break;
-				}
-				
-				
-				if (player.GetHandTotal() == dealer.GetHandTotal())
-				{
-					HandleOutcome(PUSH, bet);
-					cout << "\nIts a tie!";
-					running = false;
-					bet = 0;
-					break;
+					if (player.GetHandTotal() < 21)
+					{
+						if (player.GetHandTotal() > dealer.GetHandTotal())
+						{
+							HandleOutcome(WIN, bet);
+							cout << "\nPlayer Wins!";
+							running = false;
+							bet = 0;
+							break;
+						}
+						if (player.GetHandTotal() < dealer.GetHandTotal())
+						{
+							HandleOutcome(LOSE, bet);
+							cout << "\nDealer Wins!";
+							running = false;
+							bet = 0;
+							break;
+						}
+						break;
+					}
+
+
+					if (player.GetHandTotal() == dealer.GetHandTotal())
+					{
+						HandleOutcome(PUSH, bet);
+						cout << "\nIts a tie!";
+						running = false;
+						bet = 0;
+						break;
+					}
 				}
 			}
+
 		}
 		
 		//End of round/ask for restart
