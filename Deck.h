@@ -17,7 +17,7 @@ public:
 
 	Deck()
 	{
-		//generateDeck();
+	
 	}
 
 	~Deck()
@@ -58,4 +58,7 @@ public:
 		deckList.pop_back();
 		return newCard;
 	}
+	\
+
+		
 };

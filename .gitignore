@@ -11,3 +11,11 @@
 /.vs/slnx.sqlite
 /.vs
 /Debug
+*.lastbuildstate
+*.tlog
+*.exe
+*.ilk
+*.log
+*.obj
+*.pdb
+*.idb
