@@ -75,7 +75,9 @@ void Game::restartGame()
 
 void Game::waitTime(int w)
 {
+	//creates a variable that as in integer for seconds
 	std::chrono::seconds dura(w);
+	//passes the variable that tells the thread to wait for the x amount of seconds
 	std::this_thread::sleep_for(dura);
 }
 
@@ -565,13 +567,18 @@ int Game::GameLoop()
 		//End of round/ask for restart
 		while (running == false)
 		{
+			//Dont think this needs to be a hundreded characters but I thought it would help with some buffer overflow issues
+			//I dont think someones gonna accidently type in 100 characters,
 			char play[100];
 			cout << "\nPlay Again? (y/n): " << endl;
 			cin >> play;
+			//Checks the first position of the chracter array and checks if its a y, that way anything that goes in that at least starts with a y it will accept it.
+			//i.e yes or yse in case of typo...and yes, yeet works too....
 			//Will fix that or statement later by creating a function that takes the characters in strings and converts them all to lower case
 			if (play[0] == 'y' || play[0] == 'Y')
 			{
 				restartGame();
+				//This nice little if statement will regenerate the deck if it falls below 15 cards
 				if (deck.deckList.size() < 15)
 					deck.generateDeck();
 			}
