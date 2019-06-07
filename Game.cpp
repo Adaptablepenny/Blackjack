@@ -1,6 +1,7 @@
 
 #include "Game.h"
 
+
 Game::Game()
 {
 
@@ -59,22 +60,91 @@ void Game::InitGame()
 	return;
 }
 
+void Game::restartGame()
+{
+	running = true;
+	player.Clear();
+	dealer.Clear();
+	bet = 0;
+	dealerTurn = false;
+	pOutcome = false;
+	pDouble = false;
+	pSplit = false;
+	return;
+}
+
+//Takes string parameter, checks for any non 0-9 characters.
+//If none are found, returns integer version of string, if it contains bad char, returns -1
+int StringToIntValidation(std::string pStr)
+{
+	//First I create a string to hold any valid characters.
+
+	std::string validnumbers;
+	//iterate through chars in the string parameter
+	for (char x : pStr)
+	{
+		//decimal representation of ascii chars 48-58 are 0-9.  If the caharacter is within those,
+		//add to valid numbers string. Otherwise return -1.
+		if (x > 47 && x < 58)
+		{
+			validnumbers += x;
+		}
+		else
+		{
+			return -1;
+		}
+
+	}
+	//String to Integer conversion
+	//Get number of digits to iterate backwards.
+	short digitstep = validnumbers.length();
+	//Declare variable that we will return that will be our integer version of string.
+	int answer = 0;
+	//For each character (which corresponds to an integer digit working left to right),
+	for (char x : validnumbers)
+	{
+		//Take the characters decimal representation and subtract 48 to normalize back to decimal value, then multiply it by 10 to the power of the number of digits - 1.
+		//We take that and add the previous value of answer to it.
+		answer += (((x - 48) * (pow(10, digitstep-- - 1))));
+	}
+	//return integer values.
+	return answer;
+}
+
+
 int Game::GetBet()
 {
-	int betAmount = 0;
+	string betAmount;
+	betStart = true;
 	//Betting Loop
-	while (betAmount <= 0)
+	while (betStart)
 	{
-		cout << "Place Your Bets!" << endl << "Current Balance: $" << player.GetWallet() << endl << "Bet: $";
+		cout << "\nPlace Your Bets!" << endl << "Current Balance: $" << player.GetWallet() << endl << "Bet: $";
 		cin >> betAmount;
-		if (betAmount <= player.GetWallet())
+		if (StringToIntValidation(betAmount))
 		{
-			return betAmount;
+			betValid = StringToIntValidation(betAmount);
+			if (betValid <= player.GetWallet() && betValid > 0)
+			{
+				betStart = false;
+				betAmount.clear();
+				return betValid;
+			}
+			else if (betValid > player.GetWallet())
+			{
+				cout << "\nNot enough! Try Again!\n";
+				betValid = 0;
+				betAmount.clear();
+			}
+			
 		}
-		else if (betAmount > player.GetWallet())
+		else
 		{
-			cout << "Not enough! Try Again!";
-			betAmount = 0;
+			cout << "\n\nEnter valid number\n";
+			cin.clear();
+			cin.ignore();
+			betValid = 0;
+			betAmount.clear();
 		}
 	}
 }
@@ -136,6 +206,7 @@ void Game::HandleChoice(CHOICE pC)
 				dealerTurn = true;
 				break;
 			}
+			break;
 			
 		}
 
@@ -205,22 +276,25 @@ int Game::GameLoop()
 		//Handle BlackJacks
 		if (player.GetHandTotal() == 21 && dealer.GetHandTotal() == 21)
 		{
-			HandleOutcome(PUSH, bet);
-			running = false;
+			//HandleOutcome(PUSH, bet);
+			//running = false;
+			pOutcome = true;
 			break;
 		}
 			
 		else if (player.GetHandTotal() != 21 && dealer.GetHandTotal() == 21)
 		{
-			HandleOutcome(LOSE, bet);
-			running = false;
+			//HandleOutcome(LOSE, bet);
+			//running = false;
+			pOutcome = true;
 			break;
 		}
 			
 		else if (player.GetHandTotal() == 21 && dealer.GetHandTotal() != 21)
 		{
-			HandleOutcome(BLACKJACK, bet);
-			running = false;
+			//HandleOutcome(BLACKJACK, bet);
+			//running = false;
+			pOutcome = true;
 			break;
 		}
 		
@@ -244,35 +318,44 @@ int Game::GameLoop()
 			cin >> choice;
 
 			//Process choice selection
-			if (choice == 1)
+			//Checks to make sure choice is a valid int
+			if (StringToIntValidation(choice))
 			{
-				HandleChoice(HIT);
-			}
+				//if the choice was valid it becomes in int and put into choiceValid
+				choiceValid = StringToIntValidation(choice);
 
-			if (choice == 2)
-			{
-				HandleChoice(STAY);				
-			}
+				if (choiceValid == 1)
+				{
+					HandleChoice(HIT);
+				}
 
-			if (choice == 3 && pDouble == true)
-			{
-				HandleChoice(DOUBLE);
-				cout << "\nYou are doubling down! Your bet is being doubled!" << endl;
-				player.ChangeWallet(-bet);
-				bet = bet * 2;
-				cout << "\nNew Bet: " << bet;
+				if (choiceValid == 2)
+				{
+					HandleChoice(STAY);
+				}
+				//&& pDouble is there for input validation so the player can't select the option unless conditions are met previously
+				if (choiceValid == 3 && pDouble == true)
+				{
+					HandleChoice(DOUBLE);
+					cout << "\nYou are doubling down! Your bet is being doubled!" << endl;
+					player.ChangeWallet(-bet);
+					bet = bet * 2;
+					cout << "\nNew Bet: " << bet;
+				}
+				//&& pSplit is there for input validation so the player can't select the option unless conditions are met previously
+				if (choiceValid == 4 && pSplit == true)
+				{
+					HandleChoice(SPLIT);
+					cout << "\nYou're splitting!\n";
+					player.ChangeWallet(-bet);
+					bet = bet * 2;
+					pSplitTurn = true;
+
+				}
+
 			}
 			
-			if (choice == 4 && pSplit == true)
-			{
-				HandleChoice(SPLIT);
-				cout << "\nYou're splitting!\n";
-				player.ChangeWallet(-bet);
-				bet = bet * 2;
-				pSplitTurn = true;
-				
-			}
-
+			//This is a hot mess it needs ot be fixed.
 			if (pSplitTurn)
 			{
 				int splitchoice;
@@ -295,6 +378,7 @@ int Game::GameLoop()
 					cout << "\n\nSplit Hand: ";
 					player.printSplitHand();
 					cout << "\n\n";
+					player.printHand();
 					pSplitTurn = false;
 					pSplitOutcome = true;
 				}
@@ -304,12 +388,21 @@ int Game::GameLoop()
 			//While loop start for Dealer
 			while (dealerTurn)
 			{
-				//Dealer turn plays out 				
+				//Dealer turn plays out, will draw until 17 or more then it will stop				
 				if (dealer.GetHandTotal() < 17)
+				{
 					dealer.Draw();
+					
+				}
+				//Print Dealers Hand
 				cout << "\nDealers Hand: ";
 				dealer.printHand();
+				//print Dealers Hand total
 				cout << "\nDealer Hand Total: " << dealer.GetHandTotal();
+				//3 second wait between each draw so it doesnt just vomit out all the info at once
+				std::chrono::seconds dura(3);
+				std::this_thread::sleep_for(dura);
+				//Ends the dealers turn if it hits 17 or more
 				if (dealer.GetHandTotal() >= 17)
 				{
 					pOutcome = true;
@@ -318,6 +411,7 @@ int Game::GameLoop()
 				}	
 			}
 
+			//This is to process outcomes if player decides to split
 			if (pSplitOutcome && pOutcome)
 			{
 				while (pSplitOutcome)
@@ -388,7 +482,7 @@ int Game::GameLoop()
 			}
 			else
 			{
-
+				//Process outcome as normal if no split
 				while (pOutcome)
 				{
 					//Process Outcome, do not forget to change running to false to break the loop.
@@ -465,23 +559,22 @@ int Game::GameLoop()
 		//End of round/ask for restart
 		while (running == false)
 		{
-			char play;
-			cout << "\nPlay Again? " << endl;
+			char play[100];
+			cout << "\nPlay Again? (y/n): " << endl;
 			cin >> play;
 
-			if (play == 'y')
-				running = true;
-				player.Clear();
-				dealer.Clear();
-				bet = 0;
-				dealerTurn = false;
-				pOutcome = false;
-				pDouble = false;
-				pSplit = false;
-				if(deck.deckList.size()< 15)
+			if (play[0] == 'y')
+			{
+				restartGame();
+				if (deck.deckList.size() < 15)
 					deck.generateDeck();
-			if(play == 'n')
+			}
+			else if(play[0] == 'n')
 				break;
+			else
+			{
+				cout << "\nWrong input, enter 'y' for yes and 'n' for no.\n";
+			}
 		}
 	}
 	return  0;

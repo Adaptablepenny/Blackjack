@@ -58,7 +58,5 @@ public:
 		deckList.pop_back();
 		return newCard;
 	}
-	\
-
-		
+	
 };

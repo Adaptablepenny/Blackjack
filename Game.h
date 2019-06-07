@@ -3,6 +3,8 @@
 #include "dealer.h"
 #include "Deck.h"
 #include "actor.h"
+#include <thread>
+#include <chrono>
 
 
 class Game
@@ -18,7 +20,8 @@ public:
 	Actor* GetActorPoint();
 	bool GetRunning();
 	void SetRunning(bool pRunning);
-	int choice;
+	string choice;
+	int choiceValid;
 
 	enum OUTCOMES { BLACKJACK, WIN, LOSE, PUSH };
 
@@ -26,6 +29,7 @@ public:
 
 protected:
 	void InitGame();
+	void restartGame();
 	int GetBet();
 	void HandleOutcome(OUTCOMES pOC, int pBet);
 	void HandleChoice(CHOICE pC);
@@ -36,6 +40,8 @@ protected:
 	Actor actor;
 	bool running;
 	int bet;
+	int betValid;
+	bool betStart;
 	bool dealerTurn;
 	bool pOutcome;
 	bool pDouble;
