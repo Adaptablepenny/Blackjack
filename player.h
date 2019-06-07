@@ -28,24 +28,7 @@ public:
 		ClearSplit();
 	}
 
-	//Function for betting can this go away?
-	void Betting()
-	{
-		cout << "How much do you want to bet? ";
-		cin >> betCash;
-		
-		if (betCash <= Wallet)
-		{
-			Wallet -= betCash;
-			//cout << "New Wallet: " << pWallet;
-		}
-		else if (betCash > Wallet)
-		{
-			cout << "Not enough";
-			betCash = 0;
-		}
-		
-	}
+	
 	void splitDraw()
 	{
 		splitHand.push_back(deck->drawCard());
