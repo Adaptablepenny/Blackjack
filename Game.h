@@ -20,6 +20,7 @@ public:
 	Actor* GetActorPoint();
 	bool GetRunning();
 	void SetRunning(bool pRunning);
+	void waitTime(int w);
 	string choice;
 	int choiceValid;
 

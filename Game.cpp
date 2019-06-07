@@ -73,6 +73,12 @@ void Game::restartGame()
 	return;
 }
 
+void Game::waitTime(int w)
+{
+	std::chrono::seconds dura(w);
+	std::this_thread::sleep_for(dura);
+}
+
 //Takes string parameter, checks for any non 0-9 characters.
 //If none are found, returns integer version of string, if it contains bad char, returns -1
 int StringToIntValidation(std::string pStr)
@@ -339,6 +345,7 @@ int Game::GameLoop()
 					HandleChoice(DOUBLE);
 					cout << "\nYou are doubling down! Your bet is being doubled!" << endl;
 					player.ChangeWallet(-bet);
+					waitTime(2);
 					bet = bet * 2;
 					cout << "\nNew Bet: " << bet;
 				}
@@ -400,8 +407,7 @@ int Game::GameLoop()
 				//print Dealers Hand total
 				cout << "\nDealer Hand Total: " << dealer.GetHandTotal();
 				//3 second wait between each draw so it doesnt just vomit out all the info at once
-				std::chrono::seconds dura(3);
-				std::this_thread::sleep_for(dura);
+				waitTime(3);
 				//Ends the dealers turn if it hits 17 or more
 				if (dealer.GetHandTotal() >= 17)
 				{
@@ -562,8 +568,8 @@ int Game::GameLoop()
 			char play[100];
 			cout << "\nPlay Again? (y/n): " << endl;
 			cin >> play;
-
-			if (play[0] == 'y')
+			//Will fix that or statement later by creating a function that takes the characters in strings and converts them all to lower case
+			if (play[0] == 'y' || play[0] == 'Y')
 			{
 				restartGame();
 				if (deck.deckList.size() < 15)
