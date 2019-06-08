@@ -356,6 +356,7 @@ int Game::GameLoop()
 		player.printHand();
 		cout << "\nYour Hand Value: " << player.GetHandTotal();
 		//Handle BlackJacks
+		//Delete this comment if we can confirm it works
 		processBlackjack(player.GetHandTotal(), dealer.GetHandTotal());
 		
 		//Ask Hit,Stay,Split,Double,Insurance
@@ -416,7 +417,7 @@ int Game::GameLoop()
 
 			}
 			
-			//This is a hot mess it needs ot be fixed.
+			//This is a hot mess, it needs to be fixed.
 			if (pSplitTurn)
 			{
 				int splitchoice;
@@ -453,7 +454,6 @@ int Game::GameLoop()
 				if (dealer.GetHandTotal() < 17)
 				{
 					dealer.Draw();
-					
 				}
 				//Print Dealers Hand
 				cout << "\nDealers Hand: ";
@@ -478,14 +478,12 @@ int Game::GameLoop()
 				{
 					//Function that takes the totals of the player and dealers hand and compares them
 					processOutcome(player.GetSplitTotal(), dealer.GetHandTotal());
+					processOutcome(player.GetHandTotal(), dealer.GetHandTotal());
 					pSplitOutcome == false;
+					pOutcome == false;
 					break;
 				}
-
-
-					
-				
-
+				break;
 			}
 			else
 			{
@@ -494,7 +492,7 @@ int Game::GameLoop()
 				{
 					//Function that takes the totals of the player and dealers hand and compares them
 					processOutcome(player.GetHandTotal(), dealer.GetHandTotal());
-					running = false;
+					pOutcome == false;
 					break;					
 				}
 				break;
