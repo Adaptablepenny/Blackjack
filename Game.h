@@ -32,6 +32,8 @@ protected:
 	void InitGame();
 	void restartGame();
 	int GetBet();
+	void processBlackjack(int x, int y);
+	void processOutcome(int x, int y);
 	void HandleOutcome(OUTCOMES pOC, int pBet);
 	void HandleChoice(CHOICE pC);
 	//VARS
