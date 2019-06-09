@@ -47,12 +47,14 @@ void Game::SetRunning(bool pRunning)
 void Game::InitGame()
 {
 	dealerTurn = false;
+	betting = true;
 	pOutcome = false;
 	pDouble = false;
 	pSplit = false;
 	running = true;
 	pSplitTurn = false;
 	pSplitOutcome = false;
+	playAgain = false;
 	player.SetDeck(&deck);
 	player.ChangeWallet(100);
 	dealer.SetDeck(&deck);
@@ -63,6 +65,7 @@ void Game::InitGame()
 void Game::restartGame()
 {
 	running = true;
+	betting = true;
 	player.Clear();
 	dealer.Clear();
 	bet = 0;
@@ -70,6 +73,7 @@ void Game::restartGame()
 	pOutcome = false;
 	pDouble = false;
 	pSplit = false;
+	playAgain = false;
 	return;
 }
 
@@ -174,59 +178,44 @@ void Game::processBlackjack(int p, int d)
 	}
 }
 
-void Game::processOutcome(int p, int d)
+void Game::processOutcome(int p, int d, int b)
 {
 	if (p == 21 &&d != 21)
 	{
-		HandleOutcome(WIN, bet);
+		HandleOutcome(WIN, b);
 		cout << "\nPlayer Wins!\n";
-		running = false;
-		bet = 0;
 	}
 	else if (p > 21)
 	{
-		HandleOutcome(LOSE, bet);
-		cout << "\nYou Lose!\n";
-		running = false;
-		bet = 0;
+		HandleOutcome(LOSE, b);
+		cout << "\nYou Lose!\n";	
 	}
 	else if (d > 21)
 	{
-		HandleOutcome(WIN, bet);
+		HandleOutcome(WIN, b);
 		cout << "\nDealer Bust!\n";
-		running = false;
-		bet = 0;
 	}
 	else if (p != 21 && d == 21)
 	{
-		HandleOutcome(LOSE, bet);
+		HandleOutcome(LOSE, b);
 		cout << "\nDealer Wins!\n";
-		running = false;
-		bet = 0;
-
 	}
 	else if (p == d)
 	{
-		HandleOutcome(PUSH, bet);
+		HandleOutcome(PUSH, b);
 		cout << "\nIts a tie!\n";
-		running = false;
-		bet = 0;
 	}
 	else if (p < 21)
 	{
 		if (p > d)
 		{
-			HandleOutcome(WIN, bet);
+			HandleOutcome(WIN, b);
 			cout << "\nPlayer Wins!\n";
-			running = false;
-			bet = 0;
 		}
 		else if (p < d)
 		{
-			HandleOutcome(LOSE, bet);
+			HandleOutcome(LOSE, b);
 			cout << "\nDealer Wins!\n";
-			running = false;
-			bet = 0;
 		}
 	}
 }
@@ -245,6 +234,7 @@ void Game::HandleOutcome(OUTCOMES pOC, int pBet)
 			break;
 		default: break;
 	}
+	
 }
 
 void Game::HandleChoice(CHOICE pC)
@@ -259,20 +249,21 @@ void Game::HandleChoice(CHOICE pC)
 			cout << "\nYour Hand Value: " << player.GetHandTotal();
 			if (player.GetHandTotal() > 21)
 			{
-				//HandleOutcome(LOSE, bet);
 				cout << "\nPlayer Bust!\n";
 				pOutcome = true;
+				betting = false;
+				playAgain = true;
 				break;
-
 			}
 			if (player.GetHandTotal() == 21 && dealer.GetHandTotal() != 21)
 			{
-				//HandleOutcome(WIN, bet);
 				pOutcome = true;
+				betting = false;
 				break;
 			}
 			break;
 		}
+
 		case STAY:
 		{
 			cout << "\nYou're deciding to stay!";
@@ -360,12 +351,12 @@ int Game::GameLoop()
 		processBlackjack(player.GetHandTotal(), dealer.GetHandTotal());
 		
 		//Ask Hit,Stay,Split,Double,Insurance
-		while (bet > 0)
+		while (betting)
 		{
 			cout << endl << "Would you like to: " << endl;
 			cout << "1> Hit\n";
 			cout << "2> Stay\n";
-			if (player.GetHandTotal() >= 9  || player.GetHandTotal() <= 11)
+			if (player.GetHandTotal() >= 9  && player.GetHandTotal() <= 11 && player.GetWallet() > 0)
 			{
 				cout << "3> Double\n";
 				pDouble = true; //input validation for choice 3
@@ -380,7 +371,7 @@ int Game::GameLoop()
 
 			//Process choice selection
 			//Checks to make sure choice is a valid int
-			if (StringToIntValidation(choice))
+ 			if (StringToIntValidation(choice))
 			{
 				//if the choice was valid it becomes in int and put into choiceValid
 				choiceValid = StringToIntValidation(choice);
@@ -393,6 +384,7 @@ int Game::GameLoop()
 				if (choiceValid == 2)
 				{
 					HandleChoice(STAY);
+					break;
 				}
 				//&& pDouble is there for input validation so the player can't select the option unless conditions are met previously
 				if (choiceValid == 3 && pDouble == true)
@@ -446,68 +438,71 @@ int Game::GameLoop()
 				}
 			}
 				
-			//Dealer Plays
+			
+
+		}
+
+		//Dealer Plays
 			//While loop start for Dealer
-			while (dealerTurn)
+		while (dealerTurn)
+		{
+			//Dealer turn plays out, will draw until 17 or more then it will stop				
+			if (dealer.GetHandTotal() < 17)
 			{
-				//Dealer turn plays out, will draw until 17 or more then it will stop				
-				if (dealer.GetHandTotal() < 17)
-				{
-					dealer.Draw();
-				}
-				//Print Dealers Hand
-				cout << "\nDealers Hand: ";
-				dealer.printHand();
-				//print Dealers Hand total
-				cout << "\nDealer Hand Total: " << dealer.GetHandTotal();
-				//3 second wait between each draw so it doesnt just vomit out all the info at once
-				waitTime(3);
-				//Ends the dealers turn if it hits 17 or more
-				if (dealer.GetHandTotal() >= 17)
-				{
-					pOutcome = true;
-					dealerTurn = false;
-					break;
-				}	
+				dealer.Draw();
 			}
-
-			//This is to process outcomes if player decides to split
-			if (pSplitOutcome && pOutcome)
+			//Print Dealers Hand
+			cout << "\nDealers Hand: ";
+			dealer.printHand();
+			//print Dealers Hand total
+			cout << "\nDealer Hand Total: " << dealer.GetHandTotal();
+			//3 second wait between each draw so it doesnt just vomit out all the info at once
+			waitTime(3);
+			//Ends the dealers turn if it hits 17 or more
+			if (dealer.GetHandTotal() >= 17)
 			{
-				while (pSplitOutcome)
-				{
-					//Function that takes the totals of the player and dealers hand and compares them
-					processOutcome(player.GetSplitTotal(), dealer.GetHandTotal());
-					processOutcome(player.GetHandTotal(), dealer.GetHandTotal());
-					pSplitOutcome == false;
-					pOutcome == false;
-					break;
-				}
+				pOutcome = true;
+				dealerTurn = false;
 				break;
 			}
-			else
+		}
+
+		//This is to process outcomes if player decides to split
+		if (pSplitOutcome && pOutcome)
+		{
+			while (pSplitOutcome)
 			{
-				//Process outcome as normal if no split
-				while (pOutcome)
-				{
-					//Function that takes the totals of the player and dealers hand and compares them
-					processOutcome(player.GetHandTotal(), dealer.GetHandTotal());
-					pOutcome == false;
-					break;					
-				}
+				//Function that takes the totals of the player and dealers hand and compares them
+				processOutcome(player.GetSplitTotal(), dealer.GetHandTotal(), bet);
+				processOutcome(player.GetHandTotal(), dealer.GetHandTotal(), bet);
+				pSplitOutcome == false;
+				pOutcome == false;
 				break;
 			}
-
+	
+		}
+		else
+		{
+			//Process outcome as normal if no split
+			while (pOutcome)
+			{
+				//Function that takes the totals of the player and dealers hand and compares them
+				processOutcome(player.GetHandTotal(), dealer.GetHandTotal(), bet);
+				pOutcome = false;
+				playAgain = true;
+				break;
+			}
+			
 		}
 		
 		//End of round/ask for restart
-		while (running == false)
+		while (playAgain)
 		{
 			//Dont think this needs to be a hundreded characters but I thought it would help with some buffer overflow issues
 			//I dont think someones gonna accidently type in 100 characters,
 			char play[100];
 			cout << "\nPlay Again? (y/n): " << endl;
-			cin >> play;
+ 			cin >> play;
 			//Checks the first position of the chracter array and checks if its a y, that way anything that goes in that at least starts with a y it will accept it.
 			//i.e yes or yse in case of typo...and yes, yeet works too....
 			//Will fix that or statement later by creating a function that takes the characters in strings and converts them all to lower case

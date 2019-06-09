@@ -33,7 +33,7 @@ protected:
 	void restartGame();
 	int GetBet();
 	void processBlackjack(int x, int y);
-	void processOutcome(int x, int y);
+	void processOutcome(int x, int y, int z);
 	void HandleOutcome(OUTCOMES pOC, int pBet);
 	void HandleChoice(CHOICE pC);
 	//VARS
@@ -42,9 +42,11 @@ protected:
 	Dealer dealer;
 	Actor actor;
 	bool running;
+	bool playAgain;
 	int bet;
 	int betValid;
 	bool betStart;
+	bool betting;
 	bool dealerTurn;
 	bool pOutcome;
 	bool pDouble;
