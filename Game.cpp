@@ -144,22 +144,19 @@ int Game::GetBet()
 			}
 			else if (betValid > player.GetWallet())
 			{
-				cout << "\nNot enough! Try Again!\n";
+				cout << "\nYou don't have that much in your wallet!\n";
 				betValid = 0;
 				betAmount.clear();
 			}
-			
-		}
-		else
-		{
-			cout << "\n\nEnter valid number\n";
-			cin.clear();
-			cin.ignore();
-			betValid = 0;
-			betAmount.clear();
+			else
+			{
+				cout << "\n\nPlease enter valid number.\n";
+			}			
 		}
 	}
 }
+
+//This doesnt do jack shit, need to work on it
 void Game::processBlackjack(int p, int d)
 {	//If both get Blackjack
 	if (p == 21 && d == 21)
@@ -178,6 +175,9 @@ void Game::processBlackjack(int p, int d)
 	}
 }
 
+
+//Takes in the total handsize of the (p)layers hand, (d)ealers hand and the current (b)et
+//Still gotta be a better way to process outcomes, maybe a switch? So it looks cleaner?
 void Game::processOutcome(int p, int d, int b)
 {
 	if (p == 21 &&d != 21)
@@ -237,6 +237,7 @@ void Game::HandleOutcome(OUTCOMES pOC, int pBet)
 	
 }
 
+//Anyway to make this universal? So it can be applied to splits as well?
 void Game::HandleChoice(CHOICE pC)
 {
 	switch (pC)
@@ -347,6 +348,7 @@ int Game::GameLoop()
 		player.printHand();
 		cout << "\nYour Hand Value: " << player.GetHandTotal();
 		//Handle BlackJacks
+		//This needs to be worked on doesnt really do shit but the idea is there
 		//Delete this comment if we can confirm it works
 		processBlackjack(player.GetHandTotal(), dealer.GetHandTotal());
 		
@@ -356,6 +358,7 @@ int Game::GameLoop()
 			cout << endl << "Would you like to: " << endl;
 			cout << "1> Hit\n";
 			cout << "2> Stay\n";
+			//Had to add player.GetWallet() > 0 at the end because you were able to double your bet even though you had no money
 			if (player.GetHandTotal() >= 9  && player.GetHandTotal() <= 11 && player.GetWallet() > 0)
 			{
 				cout << "3> Double\n";
@@ -467,7 +470,7 @@ int Game::GameLoop()
 			}
 		}
 
-		//This is to process outcomes if player decides to split
+		//This is to process outcomes if player decides to split, this also needs to be worked on
 		if (pSplitOutcome && pOutcome)
 		{
 			while (pSplitOutcome)
@@ -503,6 +506,7 @@ int Game::GameLoop()
 			char play[100];
 			cout << "\nPlay Again? (y/n): " << endl;
  			cin >> play;
+
 			//Checks the first position of the chracter array and checks if its a y, that way anything that goes in that at least starts with a y it will accept it.
 			//i.e yes or yse in case of typo...and yes, yeet works too....
 			//Will fix that or statement later by creating a function that takes the characters in strings and converts them all to lower case
