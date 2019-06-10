@@ -11,12 +11,7 @@ public:
 	{
 		deck = nullptr;
 
-		/*for (int x = 0; x <= 15; x++)
-		{
-			int a = 0;
-			hand[x] = a;
-
-		}*/
+	
 	}
 
 	Actor(Deck* ptrDeck)

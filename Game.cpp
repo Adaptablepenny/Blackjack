@@ -161,17 +161,23 @@ void Game::processBlackjack(int p, int d)
 {	//If both get Blackjack
 	if (p == 21 && d == 21)
 	{
-		pOutcome = true;
+		betting = false;
+		processOutcome(player.GetHandTotal(), dealer.GetHandTotal(), bet);
+		playAgain = true;
 	}
 	//If dealer gets Blackjack
 	else if (p != 21 && d == 21)
 	{
-		pOutcome = true;
+		betting = false;
+		processOutcome(player.GetHandTotal(), dealer.GetHandTotal(), bet);
+		playAgain = true;
 	}
 	//If player gets Blackjack
 	else if (p == 21 && d != 21)
 	{
-		pOutcome = true;
+		betting = false;
+		processOutcome(player.GetHandTotal(), dealer.GetHandTotal(), bet);
+		playAgain = true;
 	}
 }
 
