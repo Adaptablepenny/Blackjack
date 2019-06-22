@@ -131,7 +131,7 @@ int Game::GetBet()
 	//Betting Loop
 	while (betStart)
 	{
-		cout << "\nPlace Your Bets!" << endl << "Current Balance: $" << player.GetWallet() << endl << "Bet: $";
+		cout << "Place Your Bets!" << endl << "Current Balance: $" << player.GetWallet() << endl << "Bet: $";
 		cin >> betAmount;
 		if (StringToIntValidation(betAmount))
 		{
@@ -189,39 +189,39 @@ void Game::processOutcome(int p, int d, int b)
 	if (p == 21 &&d != 21)
 	{
 		HandleOutcome(WIN, b);
-		cout << "\nPlayer Wins!\n";
+		cout << "\n\nPlayer Wins!\n";
 	}
 	else if (p > 21)
 	{
 		HandleOutcome(LOSE, b);
-		cout << "\nYou Lose!\n";	
+		cout << "\n\nYou Lose!\n";	
 	}
 	else if (d > 21)
 	{
 		HandleOutcome(WIN, b);
-		cout << "\nDealer Bust!\n";
+		cout << "\n\nDealer Bust!\n";
 	}
 	else if (p != 21 && d == 21)
 	{
 		HandleOutcome(LOSE, b);
-		cout << "\nDealer Wins!\n";
+		cout << "\n\nDealer Wins!\n";
 	}
 	else if (p == d)
 	{
 		HandleOutcome(PUSH, b);
-		cout << "\nIts a tie!\n";
+		cout << "\n\nIts a tie!\n";
 	}
 	else if (p < 21)
 	{
 		if (p > d)
 		{
 			HandleOutcome(WIN, b);
-			cout << "\nPlayer Wins!\n";
+			cout << "\n\nPlayer Wins!\n";
 		}
 		else if (p < d)
 		{
 			HandleOutcome(LOSE, b);
-			cout << "\nDealer Wins!\n";
+			cout << "\n\nDealer Wins!\n";
 		}
 	}
 }
@@ -250,10 +250,13 @@ void Game::HandleChoice(CHOICE pC)
 	{
 		case HIT: 
 		{
+			cout << "\n\nYou are deciding to hit!";
+			waitTime(2);
 			player.Draw();
-			cout << "Your Hand: ";
+			cout << "\n\nYour Hand: ";
 			player.printHand();
 			cout << "\nYour Hand Value: " << player.GetHandTotal();
+			waitTime(2);
 			if (player.GetHandTotal() > 21)
 			{
 				cout << "\nPlayer Bust!\n";
@@ -274,9 +277,11 @@ void Game::HandleChoice(CHOICE pC)
 		case STAY:
 		{
 			cout << "\nYou're deciding to stay!";
-			cout << "\nYour Hand: ";
+			waitTime(2);
+			cout << "\n\nYour Hand: ";
 			player.printHand();
-			cout << "\nYour Hand Value: " << player.GetHandTotal();
+			cout << "\nYour Hand Value: " << player.GetHandTotal() << endl;
+			waitTime(2);
 			if(pSplitTurn)
 			{
 				break;
@@ -284,6 +289,7 @@ void Game::HandleChoice(CHOICE pC)
 			else 
 			{
 				dealerTurn = true;
+				betting = false;
 				break;
 			}
 			break;
@@ -348,9 +354,9 @@ int Game::GameLoop()
 		player.Draw(2);
 		dealer.Draw(2);
 		//Display Dealers second card
-		cout << "Dealer Shows: " << dealer.ShowFirstCard() << endl;
+		cout << "\nDealer Shows: " << dealer.ShowFirstCard() << endl;
 		//Display Players hand
-		cout << "Your Hand: ";
+		cout << "\nYour Hand: ";
 		player.printHand();
 		cout << "\nYour Hand Value: " << player.GetHandTotal();
 		//Handle BlackJacks
@@ -361,7 +367,7 @@ int Game::GameLoop()
 		//Ask Hit,Stay,Split,Double,Insurance
 		while (betting)
 		{
-			cout << endl << "Would you like to: " << endl;
+			cout << endl << "\nWould you like to: " << endl;
 			cout << "1> Hit\n";
 			cout << "2> Stay\n";
 			//Had to add player.GetWallet() > 0 at the end because you were able to double your bet even though you had no money
@@ -376,6 +382,7 @@ int Game::GameLoop()
 				pSplit = true; //input validation for choice 4
 			}
 			//Need to implement insurance, but need to understand it first.
+			cout << "\nEnter a number selection:";
 			cin >> choice;
 
 			//Process choice selection
@@ -404,6 +411,7 @@ int Game::GameLoop()
 					waitTime(2);
 					bet = bet * 2;
 					cout << "\nNew Bet: " << bet;
+					break;
 				}
 				//&& pSplit is there for input validation so the player can't select the option unless conditions are met previously
 				if (choiceValid == 4 && pSplit == true)
@@ -419,7 +427,7 @@ int Game::GameLoop()
 			}
 			
 			//This is a hot mess, it needs to be fixed.
-			if (pSplitTurn)
+			while (pSplitTurn)
 			{
 				int splitchoice;
 				cout << "\n\nSplit Hand: ";
@@ -444,6 +452,7 @@ int Game::GameLoop()
 					player.printHand();
 					pSplitTurn = false;
 					pSplitOutcome = true;
+					break;
 				}
 			}
 				
@@ -463,6 +472,7 @@ int Game::GameLoop()
 			//Print Dealers Hand
 			cout << "\nDealers Hand: ";
 			dealer.printHand();
+			waitTime(2);
 			//print Dealers Hand total
 			cout << "\nDealer Hand Total: " << dealer.GetHandTotal();
 			//3 second wait between each draw so it doesnt just vomit out all the info at once
@@ -486,6 +496,7 @@ int Game::GameLoop()
 				processOutcome(player.GetHandTotal(), dealer.GetHandTotal(), bet);
 				pSplitOutcome == false;
 				pOutcome == false;
+				playAgain == true;
 				break;
 			}
 	
@@ -510,8 +521,11 @@ int Game::GameLoop()
 			//Dont think this needs to be a hundreded characters but I thought it would help with some buffer overflow issues
 			//I dont think someones gonna accidently type in 100 characters,
 			char play[100];
-			cout << "\nPlay Again? (y/n): " << endl;
+			waitTime(2);
+			cout << "\nPlay Again?" << endl;
+			cout << "\nY/N: ";
  			cin >> play;
+			cout << "\n";
 
 			//Checks the first position of the chracter array and checks if its a y, that way anything that goes in that at least starts with a y it will accept it.
 			//i.e yes or yse in case of typo...and yes, yeet works too....
@@ -523,12 +537,16 @@ int Game::GameLoop()
 				if (deck.deckList.size() < 15)
 					deck.generateDeck();
 			}
-			else if(play[0] == 'n')
+			else if (play[0] == 'n')
+			{
+				running = false;
 				break;
+			}
 			else
 			{
 				cout << "\nWrong input, enter 'y' for yes and 'n' for no.\n";
 			}
+	
 		}
 	}
 	return  0;
