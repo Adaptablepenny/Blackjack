@@ -64,10 +64,12 @@ void Game::InitGame()
 
 void Game::restartGame()
 {
+	y = 0;
 	running = true;
 	betting = true;
 	player.Clear();
 	dealer.Clear();
+	player.ClearSplit();
 	bet = 0;
 	dealerTurn = false;
 	pOutcome = false;
@@ -276,7 +278,7 @@ void Game::HandleChoice(CHOICE pC)
 
 		case STAY:
 		{
-			cout << "\nYou're deciding to stay!";
+			cout << "\nYou are deciding to stay!";
 			waitTime(2);
 			cout << "\n\nYour Hand: ";
 			player.printHand();
@@ -348,6 +350,7 @@ int Game::GameLoop()
 	
 		
 		//Place Bet
+		
 		int bet = GetBet();
 		player.ChangeWallet(-bet);
 		//deal cards
@@ -371,12 +374,12 @@ int Game::GameLoop()
 			cout << "1> Hit\n";
 			cout << "2> Stay\n";
 			//Had to add player.GetWallet() > 0 at the end because you were able to double your bet even though you had no money
-			if (player.GetHandTotal() >= 9  && player.GetHandTotal() <= 11 && player.GetWallet() > 0)
+			if (player.GetHandTotal() >= 9  && player.GetHandTotal() <= 11 && player.GetWallet() > 0 && y == 0)
 			{
 				cout << "3> Double\n";
 				pDouble = true; //input validation for choice 3
 			}
-			if (player.GetHandCard(0) == player.GetHandCard(1))
+			if (player.GetHandCard(0) == player.GetHandCard(1) && y == 0)//should only allow you to split once.
 			{
 				cout << "4> Split\n";
 				pSplit = true; //input validation for choice 4
@@ -394,6 +397,7 @@ int Game::GameLoop()
 
 				if (choiceValid == 1)
 				{
+					y++;
 					HandleChoice(HIT);
 				}
 
@@ -405,6 +409,7 @@ int Game::GameLoop()
 				//&& pDouble is there for input validation so the player can't select the option unless conditions are met previously
 				if (choiceValid == 3 && pDouble == true)
 				{
+					y++;
 					HandleChoice(DOUBLE);
 					cout << "\nYou are doubling down! Your bet is being doubled!" << endl;
 					player.ChangeWallet(-bet);
@@ -416,10 +421,11 @@ int Game::GameLoop()
 				//&& pSplit is there for input validation so the player can't select the option unless conditions are met previously
 				if (choiceValid == 4 && pSplit == true)
 				{
+					y++;
 					HandleChoice(SPLIT);
 					cout << "\nYou're splitting!\n";
 					player.ChangeWallet(-bet);
-					bet = bet * 2;
+					splitBet = bet;
 					pSplitTurn = true;
 
 				}
@@ -429,14 +435,14 @@ int Game::GameLoop()
 			//This is a hot mess, it needs to be fixed.
 			while (pSplitTurn)
 			{
-				int splitchoice;
 				cout << "\n\nSplit Hand: ";
 				player.printSplitHand();
 				cout << "\nWhat would you like to do for the splitted hand? ";
 				cout << "\n1> Hit \n";
 				cout << "2> Stay \n";
-				cin >> splitchoice;
-				if (splitchoice == 1)
+				cin >> splitChoice;
+				splitChoiceValid = StringToIntValidation(splitChoice);
+				if (splitChoiceValid == 1)
 				{
 					player.splitDraw();
 					cout << "\nSplit Hand: ";
@@ -444,12 +450,16 @@ int Game::GameLoop()
 					cout << "\n\nYour Hand: ";
 					player.printHand();
 				}
-				if (splitchoice == 2)
+				if (splitChoiceValid == 2)
 				{
 					cout << "\n\nSplit Hand: ";
 					player.printSplitHand();
 					cout << "\n\n";
+					cout << "You are deciding to stay on your split hand!\n\n";
+					waitTime(2);
+					cout << "Your hand: ";
 					player.printHand();
+					cout << "\nYour hand value: " << player.GetHandTotal();
 					pSplitTurn = false;
 					pSplitOutcome = true;
 					break;
@@ -491,8 +501,13 @@ int Game::GameLoop()
 		{
 			while (pSplitOutcome)
 			{
-				//Function that takes the totals of the player and dealers hand and compares them
-				processOutcome(player.GetSplitTotal(), dealer.GetHandTotal(), bet);
+				//Function that takes the totals of the player and dealers hand and compares the
+				cout << "\n\nProcessing your split hand outcome!\n";
+				waitTime(2);
+				processOutcome(player.GetSplitTotal(), dealer.GetHandTotal(), splitBet);
+				waitTime(2);
+				cout << "\n\nProcessing your hand outcome!\n";
+				waitTime(2);
 				processOutcome(player.GetHandTotal(), dealer.GetHandTotal(), bet);
 				pSplitOutcome == false;
 				pOutcome == false;
@@ -507,6 +522,8 @@ int Game::GameLoop()
 			while (pOutcome)
 			{
 				//Function that takes the totals of the player and dealers hand and compares them
+				cout << "\n\nProcessing your hand outcome!\n";
+				waitTime(2);
 				processOutcome(player.GetHandTotal(), dealer.GetHandTotal(), bet);
 				pOutcome = false;
 				playAgain = true;
