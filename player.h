@@ -32,7 +32,7 @@ public:
 	void splitDraw()
 	{
 		splitHand.push_back(deck->drawCard());
-		deck->deckList.pop_back();
+		deck->ShuffleDeck.pop_back();
 	}
 
 	int GetSplitTotal()

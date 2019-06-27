@@ -285,16 +285,8 @@ void Game::HandleChoice(CHOICE pC)
 			player.printHand();
 			cout << "\nYour Hand Value: " << player.GetHandTotal() << endl;
 			waitTime(2);
-			if(pSplitTurn)
-			{
-				break;
-			}
-			else 
-			{
-				dealerTurn = true;
-				betting = false;
-				break;
-			}
+			dealerTurn = true;
+			betting = false;
 			break;
 			
 		}
@@ -321,14 +313,14 @@ void Game::HandleChoice(CHOICE pC)
 			player.Split();
 			player.splitDraw();
 			player.Draw();
-			cout << "\nSplit Hand: ";
+			cout << "\nYour Split Hand: ";
 			player.printSplitHand();
-			cout << "\nHand: ";
+			waitTime(2);
+			cout << "\nYour Hand: ";
 			player.printHand();
+			waitTime(1);
 			break;
 			
-			//Seperate both hands into their own HandleChoice loop
-			//Process outcome for each hand individually
 		}
 	}
 }
@@ -364,7 +356,8 @@ int Game::GameLoop()
 		//Handle BlackJacks
 		//This needs to be worked on doesnt really do shit but the idea is there
 		//Delete this comment if we can confirm it works
-		processBlackjack(player.GetHandTotal(), dealer.GetHandTotal());
+		//THIS KEEPS BREAKING THE FUCKING GAME AND I DONT KNOW WHY
+		//processBlackjack(player.GetHandTotal(), dealer.GetHandTotal());
 		
 		//Ask Hit,Stay,Split,Double,Insurance
 		while (betting)
@@ -373,7 +366,7 @@ int Game::GameLoop()
 			cout << "1> Hit\n";
 			cout << "2> Stay\n";
 			//Had to add player.GetWallet() > 0 at the end because you were able to double your bet even though you had no money
-			if (player.GetHandTotal() >= 9  && player.GetHandTotal() <= 11 && player.GetWallet() > 0 && y == 0)
+			if (player.GetHandTotal() >= 9  && player.GetHandTotal() <= 11 && player.GetWallet() > 0 && y == 0)//should only allow you to double once.
 			{
 				cout << "3> Double\n";
 				pDouble = true; //input validation for choice 3
@@ -396,35 +389,39 @@ int Game::GameLoop()
 
 				if (choiceValid == 1)
 				{
-					y++;
+					y++;//stops you from splitting/doubling when you shouldn't.
 					HandleChoice(HIT);
 				}
 
 				if (choiceValid == 2)
 				{
 					HandleChoice(STAY);
-					break;
+					betting = false;
 				}
 				//&& pDouble is there for input validation so the player can't select the option unless conditions are met previously
 				if (choiceValid == 3 && pDouble == true)
 				{
-					y++;
+					y++;//stops you from splitting/doubling when you shouldn't.
 					HandleChoice(DOUBLE);
 					cout << "\nYou are doubling down! Your bet is being doubled!" << endl;
 					player.ChangeWallet(-bet);
 					waitTime(2);
 					bet = bet * 2;
 					cout << "\nNew Bet: " << bet;
-					break;
+					betting = false;
 				}
 				//&& pSplit is there for input validation so the player can't select the option unless conditions are met previously
 				if (choiceValid == 4 && pSplit == true)
 				{
-					y++;
+					y++;//stops you from splitting/doubling when you shouldn't.
 					HandleChoice(SPLIT);
 					cout << "\nYou're splitting!\n";
 					player.ChangeWallet(-bet);
 					splitBet = bet;
+					cout << "\n\nYour current bets!" << endl;
+					cout << "\nSplit: " << splitBet;
+					cout << "\nBet: " << bet;
+					waitTime(2);
 					pSplitTurn = true;
 
 				}
@@ -436,6 +433,8 @@ int Game::GameLoop()
 			{
 				cout << "\n\nSplit Hand: ";
 				player.printSplitHand();
+				cout << "\n\nSplit Hand Total: " << player.GetSplitTotal();
+				waitTime(2);
 				cout << "\nWhat would you like to do for the splitted hand? ";
 				cout << "\n1> Hit \n";
 				cout << "2> Stay \n";
@@ -444,15 +443,28 @@ int Game::GameLoop()
 				if (splitChoiceValid == 1)
 				{
 					player.splitDraw();
-					cout << "\nSplit Hand: ";
-					player.printSplitHand();
-					cout << "\n\nYour Hand: ";
-					player.printHand();
+					waitTime(1);
+					if (player.GetSplitTotal() > 21)
+					{
+						cout << "\nPlayer Busts!" << endl;
+						pSplitTurn = false;
+						pSplitOutcome = true;
+						
+					}
+					if (player.GetSplitTotal() == 21 && dealer.GetHandTotal() != 21)
+					{
+						cout << "\Player Wins!" << endl;
+						pSplitTurn == false;
+						pSplitOutcome == true;
+						
+					}
+
 				}
 				if (splitChoiceValid == 2)
 				{
 					cout << "\n\nSplit Hand: ";
 					player.printSplitHand();
+					cout << "\n\nSplit Hand Total: " << player.GetSplitTotal();
 					cout << "\n\n";
 					cout << "You are deciding to stay on your split hand!\n\n";
 					waitTime(2);
@@ -461,7 +473,6 @@ int Game::GameLoop()
 					cout << "\nYour hand value: " << player.GetHandTotal();
 					pSplitTurn = false;
 					pSplitOutcome = true;
-					break;
 				}
 			}
 				
@@ -491,7 +502,6 @@ int Game::GameLoop()
 			{
 				pOutcome = true;
 				dealerTurn = false;
-				break;
 			}
 		}
 
@@ -508,10 +518,12 @@ int Game::GameLoop()
 				cout << "\n\nProcessing your hand outcome!\n";
 				waitTime(2);
 				processOutcome(player.GetHandTotal(), dealer.GetHandTotal(), bet);
+				waitTime(2);
 				pSplitOutcome == false;
 				pOutcome == false;
 				playAgain == true;
 				break;
+				
 			}
 	
 		}
@@ -564,6 +576,7 @@ int Game::GameLoop()
 			else
 			{
 				cout << "\nWrong input, enter 'y' for yes and 'n' for no.\n";
+				cin.clear();
 			}
 	
 		}
