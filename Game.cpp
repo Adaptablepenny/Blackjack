@@ -59,6 +59,7 @@ void Game::InitGame()
 	player.ChangeWallet(100);
 	dealer.SetDeck(&deck);
 	deck.generateDeck();
+	deck.deckShuffle();
 	return;
 }
 
@@ -340,7 +341,6 @@ int Game::GameLoop()
 	//We have initialized
 	InitGame();
 	
-
 	//Begin Game Loop
 	while (running)
 	{
@@ -348,7 +348,6 @@ int Game::GameLoop()
 		//Welcome the  player
 		
 	
-		
 		//Place Bet
 		
 		int bet = GetBet();
@@ -551,8 +550,11 @@ int Game::GameLoop()
 			{
 				restartGame();
 				//This nice little if statement will regenerate the deck if it falls below 15 cards
-				if (deck.deckList.size() < 15)
+				if (deck.ShuffleDeck.size() < 15)
+				{
 					deck.generateDeck();
+					deck.deckShuffle();
+				}
 			}
 			else if (play[0] == 'n')
 			{
