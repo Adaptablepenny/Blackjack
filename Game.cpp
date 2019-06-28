@@ -193,26 +193,32 @@ void Game::processOutcome(int p, int d, int b)
 	{
 		HandleOutcome(WIN, b);
 		cout << "\n\nPlayer Wins!\n";
+		cout << "\nYou earned: $" << b << endl;
 	}
 	else if (p > 21)
 	{
 		HandleOutcome(LOSE, b);
-		cout << "\n\nYou Lose!\n";	
+		cout << "\n\nYou Lose!\n";
+		cout << "\nYou lost: $" << b << endl;
 	}
 	else if (d > 21)
 	{
 		HandleOutcome(WIN, b);
 		cout << "\n\nDealer Bust!\n";
+		cout << "\nYou earned: $" << b << endl;
 	}
 	else if (p != 21 && d == 21)
 	{
 		HandleOutcome(LOSE, b);
 		cout << "\n\nDealer Wins!\n";
+		cout << "\nYou lost: $" << b << endl;
 	}
 	else if (p == d)
 	{
 		HandleOutcome(PUSH, b);
 		cout << "\n\nIts a tie!\n";
+		cout << "\nBet of " << b << " returned.\n";
+		
 	}
 	else if (p < 21)
 	{
@@ -220,11 +226,13 @@ void Game::processOutcome(int p, int d, int b)
 		{
 			HandleOutcome(WIN, b);
 			cout << "\n\nPlayer Wins!\n";
+			cout << "\nYou earned: $" << b << endl;
 		}
 		else if (p < d)
 		{
 			HandleOutcome(LOSE, b);
 			cout << "\n\nDealer Wins!\n";
+			cout << "\nYou lost: $" << b << endl;
 		}
 	}
 }
@@ -296,11 +304,15 @@ void Game::HandleChoice(CHOICE pC)
 			
 			
 			//Only draw one card
+			cout << "\n\nYou are doubling down! Your bet is being doubled!" << endl;
+			waitTime(2);
+			cout << "\nNew Bet: " << bet;
 			player.Draw();
 			cout << "\nYour Hand: ";
 			player.printHand();
-			cout << "\nYour Hand Value: " << player.GetHandTotal();
+			cout << "\nYour Hand Value: " << player.GetHandTotal() << endl;
 			dealerTurn = true;
+			betting = false;
 									
 			
 			//break and proceed to outcome
@@ -319,6 +331,12 @@ void Game::HandleChoice(CHOICE pC)
 			cout << "\nYour Hand: ";
 			player.printHand();
 			waitTime(1);
+			cout << "\nYou're splitting!\n";
+			cout << "\n\nYour current bets!" << endl;
+			cout << "\nSplit: " << &splitBet;
+			cout << "\nBet: " << &bet;
+			waitTime(2);
+			pSplitTurn = true;
 			break;
 			
 		}
@@ -342,7 +360,7 @@ int Game::GameLoop()
 	
 		//Place Bet
 		
-		int bet = GetBet();
+		bet = GetBet();
 		player.ChangeWallet(-bet);
 		//deal cards
 		player.Draw(2);
@@ -377,7 +395,7 @@ int Game::GameLoop()
 				pSplit = true; //input validation for choice 4
 			}
 			//Need to implement insurance, but need to understand it first.
-			cout << "\nEnter a number selection:";
+			cout << "\nEnter a number selection: ";
 			cin >> choice;
 
 			//Process choice selection
@@ -403,32 +421,29 @@ int Game::GameLoop()
 				{
 					y++;//stops you from splitting/doubling when you shouldn't.
 					HandleChoice(DOUBLE);
-					cout << "\nYou are doubling down! Your bet is being doubled!" << endl;
 					player.ChangeWallet(-bet);
-					waitTime(2);
 					bet = bet * 2;
-					cout << "\nNew Bet: " << bet;
-					betting = false;
+					
+					
 				}
 				//&& pSplit is there for input validation so the player can't select the option unless conditions are met previously
 				if (choiceValid == 4 && pSplit == true)
 				{
 					y++;//stops you from splitting/doubling when you shouldn't.
 					HandleChoice(SPLIT);
-					cout << "\nYou're splitting!\n";
 					player.ChangeWallet(-bet);
 					splitBet = bet;
-					cout << "\n\nYour current bets!" << endl;
-					cout << "\nSplit: " << splitBet;
-					cout << "\nBet: " << bet;
-					waitTime(2);
-					pSplitTurn = true;
+					
 
 				}
 
+
+				//implement insurance maybe?
+
 			}
 			
-			//This is a hot mess, it needs to be fixed.
+			//Not entirely a hot mess any more but im pretty sure there can be more efficient ways of doing things here.
+			//Maybe create a switch statement akin to the normal hit/stay/double/split but for split hands only, that way it looks neater here
 			while (pSplitTurn)
 			{
 				cout << "\n\nSplit Hand: ";
@@ -438,10 +453,12 @@ int Game::GameLoop()
 				cout << "\nWhat would you like to do for the splitted hand? ";
 				cout << "\n1> Hit \n";
 				cout << "2> Stay \n";
+				cout << "\nEnter a number selection: ";
 				cin >> splitChoice;
-				splitChoiceValid = StringToIntValidation(splitChoice);
+				splitChoiceValid = StringToIntValidation(splitChoice); //checks to make the input is a valid integer
 				if (splitChoiceValid == 1)
 				{
+					//This statement draws and checks if the players has busted or blackjacks if not it just draws normally
 					player.splitDraw();
 					waitTime(1);
 					if (player.GetSplitTotal() > 21)
